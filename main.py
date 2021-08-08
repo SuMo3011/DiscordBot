@@ -20,20 +20,44 @@ async def on_message(message):
 
 
   if msg.startswith('!joke'):
-    post = reddit.get_post(reddit_client, 'Jokes', 'hot', False)
-    await message.channel.send(f'{post.title}\n\n{post.selftext}')
+    subred = msg.split('!joke ', 1)
+    if len(subred)>1:
+      subred = subred[1]
+    else:
+      subred = 'Jokes'
+    post = reddit.get_post(reddit_client=reddit_client, subreddit=subred, sort_by='hot', over_18=False, image = False)
+    if post == 'Try Again':
+      await message.channel.send(post)
+    else:
+      await message.channel.send(f'{post.title}\n\n{post.selftext}\n\n{post.url}')
   
   if msg.startswith('!meme'):
-    subred = msg.split('!meme', 1)
+    subred = msg.split('!meme ', 1)
     if len(subred)>1:
       subred = subred[1]
     else:
       subred = 'Memes'
+    post = reddit.get_post(reddit_client=reddit_client, subreddit=subred, sort_by='top', over_18=False, image = True)
+    if post == 'Try Again':
+      await message.channel.send(post)
+    else:
+      embed = discord.Embed(title=post.title, color=discord.Color.purple())
+      embed.set_image(url=post.url)
+      await message.channel.send(post.url, embed=embed)
 
-    post = reddit.get_post(reddit_client, subred, 'top', False)
-    embed = discord.Embed(title=post.title, color=discord.Color.purple())
-    embed.set_image(url=post.url)
-    await message.channel.send(embed=embed)
+  if msg.startswith('!post'):
+    subred = msg.split('!post ', 1)
+    if len(subred)>1:
+      subred = subred[1]
+    else:
+      subred = 'Jokes'
+    post = reddit.get_post(reddit_client=reddit_client, subreddit=subred, sort_by='top', over_18=False, image = False)
+    if post == 'Try Again':
+      await message.channel.send(post)
+    else:
+      embed = discord.Embed(title=post.title, color=discord.Color.purple())
+      embed.set_image(url=post.url)
+      await message.channel.send(f'{post.title}\n{post.selftext}\n{post.url}', embed=embed)
 
 
 reddit_client = reddit.create_reddit_object()

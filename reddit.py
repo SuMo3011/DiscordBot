@@ -16,9 +16,11 @@ def create_reddit_object():
   check_for_async=False)
 
 
-def get_post(reddit_client, subreddit, sort_by, over_18):
+def get_post(reddit_client, subreddit, sort_by, over_18, image = False):
   subred = reddit_client.subreddit(subreddit)
   post_list = []
+  image_ext = ['.jpg', '.png', '.jpeg', 'gif']
+
   if sort_by == 'hot':
     posts = subred.hot(limit=50)
 
@@ -29,9 +31,18 @@ def get_post(reddit_client, subreddit, sort_by, over_18):
     posts = subred.top(limit=50)
 
   for post in posts:
+
     if post.pinned == False and post.over_18 == over_18 and len(post.selftext)<=1500:
+      if image:
+        if not any(str(post.url).endswith(ext) for ext in image_ext):
+          continue
+      else:
+        if any(post.url.endswith(ext) for ext in image_ext):
+          continue
       post_list.append(post)
-  # post = next(posts)
+      
+  if len(post_list)==0:
+    return "Try Again, no post found"
   return random.choice(post_list)
 
 # reddit = create_reddit_object()
